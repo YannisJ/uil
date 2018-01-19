@@ -1,7 +1,8 @@
+(function(l, i, v, e) { v = l.createElement(i); v.async = 1; v.src = '//' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; e = l.getElementsByTagName(i)[0]; e.parentNode.insertBefore(v, e)})(document, 'script');
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(factory((global.UIL = global.UIL || {})));
+	(factory((global.UIL = {})));
 }(this, (function (exports) { 'use strict';
 
 	// Polyfills
@@ -52,8 +53,6 @@
 
 			Object.assign = function ( target ) {
 
-				'use strict';
-
 				if ( target === undefined || target === null ) {
 
 					throw new TypeError( 'Cannot convert undefined or null to object' );
@@ -96,388 +95,429 @@
 
 	var Tools = {
 
-	    main: null,
+		main: null,
 
-	    doc: document,
-	    frag: document.createDocumentFragment(),
+		doc: document,
+		frag: document.createDocumentFragment(),
 
-	    URL: window.URL || window.webkitURL,
+		URL: window.URL || window.webkitURL,
 
-	    isLoop: false,
-	    listens: [],
+		isLoop: false,
+		listens: [],
 
-	    svgns: "http://www.w3.org/2000/svg",
-	    htmls: "http://www.w3.org/1999/xhtml",
+		svgns: "http://www.w3.org/2000/svg",
+		htmls: "http://www.w3.org/1999/xhtml",
 
-	    DOM_SIZE: [ 'height', 'width', 'top', 'left', 'bottom', 'right', 'margin-left', 'margin-right', 'margin-top', 'margin-bottom'],
-	    SVG_TYPE_D: [ 'pattern', 'defs', 'transform', 'stop', 'animate', 'radialGradient', 'linearGradient', 'animateMotion' ],
-	    SVG_TYPE_G: [ 'rect', 'circle', 'path', 'polygon', 'text', 'g', 'line', 'foreignObject' ],
+		DOM_SIZE: [ 'height', 'width', 'top', 'left', 'bottom', 'right', 'margin-left', 'margin-right', 'margin-top', 'margin-bottom' ],
+		SVG_TYPE_D: [ 'pattern', 'defs', 'transform', 'stop', 'animate', 'radialGradient', 'linearGradient', 'animateMotion' ],
+		SVG_TYPE_G: [ 'rect', 'circle', 'path', 'polygon', 'text', 'g', 'line', 'foreignObject' ],
 
-	    size: {
-	        
-	        w: 240,
-	        h: 20,
-	        p: 30,
-	        s: 20,
+		size: {
 
-	    },
+			w: 240,
+			h: 20,
+			p: 30,
+			s: 20,
 
-	    // colors
+		},
 
-	    colors: {
+		// colors
 
-	        text : '#C0C0C0',
-	        background: 'rgba(44,44,44,0.3)',
+		colors: {
 
-	        border : '#4f4f4f',
-	        borderSelect : '#308AFF',
+			text: '#C0C0C0',
+			background: 'rgba(44,44,44,0.3)',
 
-	        button : '#404040',
-	        boolbg : '#181818',
+			border: '#4f4f4f',
+			borderSelect: '#308AFF',
 
-	        select : '#308AFF',
-	        moving : '#03afff',
-	        down : '#024699',
+			button: '#404040',
+			boolbg: '#181818',
 
-	        stroke: '#606060',//'rgba(120,120,120,0.6)',
-	        scroll: '#333333',
+			select: '#308AFF',
+			moving: '#03afff',
+			down: '#024699',
 
-	    },
+			stroke: '#606060', //'rgba(120,120,120,0.6)',
+			scroll: '#333333',
 
-	    // style css
+		},
 
-	    css : {
-	        basic: '-o-user-select:none; -ms-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -moz-user-select:none;' + 'position:absolute; pointer-events:none; box-sizing:border-box; margin:0; padding:0; border:none; overflow:hidden; background:none;',
-	    },
+		// style css
 
-	    // svg path
+		css: {
+			basic: '-o-user-select:none; -ms-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -moz-user-select:none;' + 'position:absolute; pointer-events:none; box-sizing:border-box; margin:0; padding:0; border:none; overflow:hidden; background:none;',
+		},
 
-	    GPATH: 'M 7 7 L 7 8 8 8 8 7 7 7 M 5 7 L 5 8 6 8 6 7 5 7 M 3 7 L 3 8 4 8 4 7 3 7 M 7 5 L 7 6 8 6 8 5 7 5 M 6 6 L 6 5 5 5 5 6 6 6 M 7 3 L 7 4 8 4 8 3 7 3 M 6 4 L 6 3 5 3 5 4 6 4 M 3 5 L 3 6 4 6 4 5 3 5 M 3 3 L 3 4 4 4 4 3 3 3 Z',
+		// svg path
 
-	    setText : function( size, color, font ){
+		GPATH: 'M 7 7 L 7 8 8 8 8 7 7 7 M 5 7 L 5 8 6 8 6 7 5 7 M 3 7 L 3 8 4 8 4 7 3 7 M 7 5 L 7 6 8 6 8 5 7 5 M 6 6 L 6 5 5 5 5 6 6 6 M 7 3 L 7 4 8 4 8 3 7 3 M 6 4 L 6 3 5 3 5 4 6 4 M 3 5 L 3 6 4 6 4 5 3 5 M 3 3 L 3 4 4 4 4 3 3 3 Z',
 
-	        size = size || 11;
-	        color = color || '#CCC';
-	        font = font || '"Consolas", "Lucida Console", Monaco, monospace';
+		setText: function ( size, color, font ) {
 
-	        Tools.colors.text = color;
+			size = size || 11;
+			color = color || '#CCC';
+			font = font || '"Consolas", "Lucida Console", Monaco, monospace';
 
-	        Tools.css.txt = Tools.css.basic + 'font-family:'+font+'; font-size:'+size+'px; color:'+color+'; padding:2px 10px; left:0; top:2px; height:16px; width:100px; overflow:hidden; white-space: nowrap;';
-	        Tools.css.txtedit = Tools.css.txt + 'pointer-events:auto; padding:2px 5px; outline:none; -webkit-appearance:none; -moz-appearance:none; border:1px dashed #4f4f4f; -ms-user-select:element;';
-	        Tools.css.txtselect = Tools.css.txt + 'pointer-events:auto; padding:2px 5px; outline:none; -webkit-appearance:none; -moz-appearance:none; border:1px dashed ' + Tools.colors.border+'; -ms-user-select:element;';
-	        Tools.css.txtnumber = Tools.css.txt + 'letter-spacing:-1px; padding:2px 5px;';
-	        Tools.css.item = Tools.css.txt + 'position:relative; background:rgba(0,0,0,0.2); margin-bottom:1px; pointer-events:auto; cursor:pointer;';
+			Tools.colors.text = color;
 
-	    },
+			Tools.css.txt = Tools.css.basic + 'font-family:' + font + '; font-size:' + size + 'px; color:' + color + '; padding:2px 10px; left:0; top:2px; height:16px; width:100px; overflow:hidden; white-space: nowrap;';
+			Tools.css.txtedit = Tools.css.txt + 'pointer-events:auto; padding:2px 5px; outline:none; -webkit-appearance:none; -moz-appearance:none; border:1px dashed #4f4f4f; -ms-user-select:element;';
+			Tools.css.txtselect = Tools.css.txt + 'pointer-events:auto; padding:2px 5px; outline:none; -webkit-appearance:none; -moz-appearance:none; border:1px dashed ' + Tools.colors.border + '; -ms-user-select:element;';
+			Tools.css.txtnumber = Tools.css.txt + 'letter-spacing:-1px; padding:2px 5px;';
+			Tools.css.item = Tools.css.txt + 'position:relative; background:rgba(0,0,0,0.2); margin-bottom:1px; pointer-events:auto; cursor:pointer;';
 
-	    setSvg: function( dom, type, value, id ){
+		},
 
-	        if( id === -1 ) dom.setAttributeNS( null, type, value );
-	        else dom.childNodes[ id || 0 ].setAttributeNS( null, type, value );
+		setSvg: function ( dom, type, value, id ) {
 
-	    },
+			if ( id === - 1 ) dom.setAttributeNS( null, type, value );
+			else dom.childNodes[ id || 0 ].setAttributeNS( null, type, value );
 
-	    set: function( g, o ){
+		},
 
-	        for( var att in o ){
-	            if( att === 'txt' ) g.textContent = o[ att ];
-	            g.setAttributeNS( null, att, o[ att ] );
-	        }
-	        
-	    },
+		set: function ( g, o ) {
 
-	    get: function( dom, id ){
+			for ( var att in o ) {
 
-	        if( id === undefined ) return dom; // root
-	        else if( !isNaN( id ) ) return dom.childNodes[ id ]; // first child
-	        else if( id instanceof Array ){
-	            if(id.length === 2) return dom.childNodes[ id[0] ].childNodes[ id[1] ];
-	            if(id.length === 3) return dom.childNodes[ id[0] ].childNodes[ id[1] ].childNodes[ id[2] ];
-	        }
+				if ( att === 'txt' ) g.textContent = o[ att ];
+				g.setAttributeNS( null, att, o[ att ] );
 
-	    },
+			}
 
-	    /*setDom : function( dom, type, value ){
+		},
+
+		get: function ( dom, id ) {
+
+			if ( id === undefined ) return dom; // root
+			else if ( ! isNaN( id ) ) return dom.childNodes[ id ]; // first child
+			else if ( id instanceof Array ) {
+
+				if ( id.length === 2 ) return dom.childNodes[ id[ 0 ] ].childNodes[ id[ 1 ] ];
+				if ( id.length === 3 ) return dom.childNodes[ id[ 0 ] ].childNodes[ id[ 1 ] ].childNodes[ id[ 2 ] ];
+
+			}
+
+		},
+
+		/*setDom : function( dom, type, value ){
 
 	        var ext = Tools.DOM_SIZE.indexOf(type) !== -1 ? 'px' : '';
 	        dom.style[type] = value + ext;
 
 	    },*/
 
-	    dom : function ( type, css, obj, dom, id ) {
+		dom: function ( type, css, obj, dom, id ) {
 
-	        type = type || 'div';
+			type = type || 'div';
 
-	        if( Tools.SVG_TYPE_D.indexOf(type) !== -1 || Tools.SVG_TYPE_G.indexOf(type) !== -1 ){ // is svg element
+			if ( Tools.SVG_TYPE_D.indexOf( type ) !== - 1 || Tools.SVG_TYPE_G.indexOf( type ) !== - 1 ) { // is svg element
 
-	            // create new svg if not def
-	            if( dom === undefined ) dom = Tools.doc.createElementNS( Tools.svgns, 'svg' );
+				// create new svg if not def
+				if ( dom === undefined ) dom = Tools.doc.createElementNS( Tools.svgns, 'svg' );
 
-	            Tools.addAttributes( dom, type, obj, id );
-	            
-	        } else { // is html element
+				Tools.addAttributes( dom, type, obj, id );
 
-	            if( dom === undefined ) dom = Tools.doc.createElementNS( Tools.htmls, type );
-	            else dom = dom.appendChild( Tools.doc.createElementNS( Tools.htmls, type ) );
+			} else { // is html element
 
-	        }
+				if ( dom === undefined ) dom = Tools.doc.createElementNS( Tools.htmls, type );
+				else dom = dom.appendChild( Tools.doc.createElementNS( Tools.htmls, type ) );
 
-	        if( css ) dom.style.cssText = css; 
+				if ( obj ) Tools.addDomAttributes( dom, obj );
 
-	        if( id === undefined ) return dom;
-	        else return dom.childNodes[ id || 0 ];
+			}
 
-	    },
+			if ( css ) dom.style.cssText = css;
 
-	    addAttributes : function( dom, type, o, id ){
+			if ( id === undefined ) return dom;
+			else return dom.childNodes[ id || 0 ];
 
-	        var g = Tools.doc.createElementNS( Tools.svgns, type );
-	        Tools.set( g, o );
-	        Tools.get( dom, id ).appendChild( g );
-	        if( Tools.SVG_TYPE_G.indexOf(type) !== -1 ) g.style.pointerEvents = 'none';
-	        return g;
+		},
 
-	    },
+		addDomAttributes: function ( dom, attributes ) {
 
-	    clear : function( dom ){
+			for ( var attribute in attributes ) {
 
-	        Tools.purge( dom );
-	        while (dom.firstChild) {
-	            if ( dom.firstChild.firstChild ) Tools.clear( dom.firstChild );
-	            dom.removeChild( dom.firstChild ); 
-	        }
+				dom.setAttribute( attribute, attributes[ attribute ] );
 
-	    },
+			}
 
-	    purge : function ( dom ) {
+		},
 
-	        var a = dom.attributes, i, n;
-	        if (a) {
-	            i = a.length;
-	            while(i--){
-	                n = a[i].name;
-	                if (typeof dom[n] === 'function') dom[n] = null;
-	            }
-	        }
-	        a = dom.childNodes;
-	        if (a) {
-	            i = a.length;
-	            while(i--){ 
-	                Tools.purge( dom.childNodes[i] ); 
-	            }
-	        }
+		addAttributes: function ( dom, type, o, id ) {
 
-	    },
+			var g = Tools.doc.createElementNS( Tools.svgns, type );
+			Tools.set( g, o );
+			Tools.get( dom, id ).appendChild( g );
+			if ( Tools.SVG_TYPE_G.indexOf( type ) !== - 1 ) g.style.pointerEvents = 'none';
+			return g;
 
+		},
 
+		clear: function ( dom ) {
 
-	    // LOOP
+			Tools.purge( dom );
+			while ( dom.firstChild ) {
 
-	    loop : function(){
+				if ( dom.firstChild.firstChild ) Tools.clear( dom.firstChild );
+				dom.removeChild( dom.firstChild );
 
-	        if( Tools.isLoop ) requestAnimationFrame( Tools.loop );
-	        Tools.update();
+			}
 
-	    },
+		},
 
-	    update : function(){
+		purge: function ( dom ) {
 
-	        var i = Tools.listens.length;
-	        while(i--) Tools.listens[i].listening();
+			var a = dom.attributes, i, n;
+			if ( a ) {
 
-	    },
+				i = a.length;
+				while ( i -- ) {
 
-	    removeListen : function ( proto ){
+					n = a[ i ].name;
+					if ( typeof dom[ n ] === 'function' ) dom[ n ] = null;
 
-	        var id = Tools.listens.indexOf( proto );
-	        Tools.listens.splice(id, 1);
+				}
 
-	        if( Tools.listens.length === 0 ) Tools.isLoop = false;
+			}
+			a = dom.childNodes;
+			if ( a ) {
 
-	    },
+				i = a.length;
+				while ( i -- ) {
 
-	    addListen : function ( proto ){
+					Tools.purge( dom.childNodes[ i ] );
 
-	        var id = Tools.listens.indexOf( proto );
+				}
 
-	        if( id !== -1 ) return; 
+			}
 
-	        Tools.listens.push( proto );
+		},
 
-	        if( !Tools.isLoop ){
-	            Tools.isLoop = true;
-	            Tools.loop();
-	        }
 
-	    },
 
-	    // ----------------------
-	    //   Color function
-	    // ----------------------
+		// LOOP
 
-	    ColorLuma : function ( hex, lum ) {
+		loop: function () {
 
-	        // validate hex string
-	        hex = String(hex).replace(/[^0-9a-f]/gi, '');
-	        if (hex.length < 6) {
-	            hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
-	        }
-	        lum = lum || 0;
+			if ( Tools.isLoop ) requestAnimationFrame( Tools.loop );
+			Tools.update();
 
-	        // convert to decimal and change luminosity
-	        var rgb = "#", c, i;
-	        for (i = 0; i < 3; i++) {
-	            c = parseInt(hex.substr(i*2,2), 16);
-	            c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
-	            rgb += ("00"+c).substr(c.length);
-	        }
+		},
 
-	        return rgb;
+		update: function () {
 
-	    },
+			var i = Tools.listens.length;
+			while ( i -- ) Tools.listens[ i ].listening();
 
-	    findDeepInver: function( rgb ){ 
+		},
 
-	        return (rgb[0] * 0.3 + rgb[1] * .59 + rgb[2] * .11) <= 0.6;
-	        
-	    },
+		removeListen: function ( proto ) {
 
+			var id = Tools.listens.indexOf( proto );
+			Tools.listens.splice( id, 1 );
 
-	    hexToHtml: function(v){ 
-	        v = v === undefined ? 0x000000 : v;
-	        return "#" + ("000000" + v.toString(16)).substr(-6);
-	        
-	    },
+			if ( Tools.listens.length === 0 ) Tools.isLoop = false;
 
-	    htmlToHex: function(v){ 
+		},
 
-	        return v.toUpperCase().replace("#", "0x");
+		addListen: function ( proto ) {
 
-	    },
+			var id = Tools.listens.indexOf( proto );
 
-	    u255: function(color, i){
+			if ( id !== - 1 ) return;
 
-	        return parseInt(color.substring(i, i + 2), 16) / 255;
+			Tools.listens.push( proto );
 
-	    },
+			if ( ! Tools.isLoop ) {
 
-	    u16: function( color, i ){
+				Tools.isLoop = true;
+				Tools.loop();
 
-	        return parseInt(color.substring(i, i + 1), 16) / 15;
+			}
 
-	    },
+		},
 
-	    unpack: function( color ){
+		// ----------------------
+		//   Color function
+		// ----------------------
 
-	        if (color.length == 7) return [ Tools.u255(color, 1), Tools.u255(color, 3), Tools.u255(color, 5) ];
-	        else if (color.length == 4) return [ Tools.u16(color,1), Tools.u16(color,2), Tools.u16(color,3) ];
+		ColorLuma: function ( hex, lum ) {
 
-	    },
+			// validate hex string
+			hex = String( hex ).replace( /[^0-9a-f]/gi, '' );
+			if ( hex.length < 6 ) {
 
-	    htmlRgb: function( rgb ){
+				hex = hex[ 0 ] + hex[ 0 ] + hex[ 1 ] + hex[ 1 ] + hex[ 2 ] + hex[ 2 ];
 
-	        return 'rgb(' + Math.round(rgb[0] * 255) + ','+ Math.round(rgb[1] * 255) + ','+ Math.round(rgb[2] * 255) + ')';
+			}
+			lum = lum || 0;
 
-	    },
+			// convert to decimal and change luminosity
+			var rgb = "#", c, i;
+			for ( i = 0; i < 3; i ++ ) {
 
-	    rgbToHex : function( rgb ){
+				c = parseInt( hex.substr( i * 2, 2 ), 16 );
+				c = Math.round( Math.min( Math.max( 0, c + ( c * lum ) ), 255 ) ).toString( 16 );
+				rgb += ( "00" + c ).substr( c.length );
 
-	        return '#' + ( '000000' + ( ( rgb[0] * 255 ) << 16 ^ ( rgb[1] * 255 ) << 8 ^ ( rgb[2] * 255 ) << 0 ).toString( 16 ) ).slice( - 6 );
+			}
 
-	    },
+			return rgb;
 
-	    hueToRgb: function( p, q, t ){
+		},
 
-	        if ( t < 0 ) t += 1;
-	        if ( t > 1 ) t -= 1;
-	        if ( t < 1 / 6 ) return p + ( q - p ) * 6 * t;
-	        if ( t < 1 / 2 ) return q;
-	        if ( t < 2 / 3 ) return p + ( q - p ) * 6 * ( 2 / 3 - t );
-	        return p;
+		findDeepInver: function ( rgb ) {
 
-	    },
+			return ( rgb[ 0 ] * 0.3 + rgb[ 1 ] * .59 + rgb[ 2 ] * .11 ) <= 0.6;
 
-	    rgbToHsl: function(rgb){
+		},
 
-	        var r = rgb[0], g = rgb[1], b = rgb[2], min = Math.min(r, g, b), max = Math.max(r, g, b), delta = max - min, h = 0, s = 0, l = (min + max) / 2;
-	        if (l > 0 && l < 1) s = delta / (l < 0.5 ? (2 * l) : (2 - 2 * l));
-	        if (delta > 0) {
-	            if (max == r && max != g) h += (g - b) / delta;
-	            if (max == g && max != b) h += (2 + (b - r) / delta);
-	            if (max == b && max != r) h += (4 + (r - g) / delta);
-	            h /= 6;
-	        }
-	        return [ h, s, l ];
 
-	    },
+		hexToHtml: function ( v ) {
 
-	    hslToRgb: function( hsl ){
+			v = v === undefined ? 0x000000 : v;
+			return "#" + ( "000000" + v.toString( 16 ) ).substr( - 6 );
 
-	        var p, q, h = hsl[0], s = hsl[1], l = hsl[2];
+		},
 
-	        if ( s === 0 ) return [ l, l, l ];
-	        else {
-	            q = l <= 0.5 ? l * (s + 1) : l + s - ( l * s );
-	            p = l * 2 - q;
-	            return [ Tools.hueToRgb(p, q, h + 0.33333), Tools.hueToRgb(p, q, h), Tools.hueToRgb(p, q, h - 0.33333) ];
-	        }
+		htmlToHex: function ( v ) {
 
-	    },
+			return v.toUpperCase().replace( "#", "0x" );
 
-	    // svg to canvas test 
+		},
 
-	    toCanvas: function( canvas, content, w, h ){
+		u255: function ( color, i ) {
 
-	        var ctx = canvas.getContext("2d");
+			return parseInt( color.substring( i, i + 2 ), 16 ) / 255;
 
-	        var dcopy = null;
+		},
 
-	        if( typeof content === 'string' ){
+		u16: function ( color, i ) {
 
-	            dcopy = Tools.dom( 'iframe', 'position:abolute; left:0; top:0; width:'+w+'px; height:'+h+'px;' );
-	            dcopy.src = content;
+			return parseInt( color.substring( i, i + 1 ), 16 ) / 15;
 
-	        }else{
-	            dcopy = content.cloneNode(true);
-	            dcopy.style.left = 0;
-	        }
+		},
 
-	        var svg = Tools.dom( 'foreignObject', 'position:abolute; left:0; top:0;', { width:w, height:h });
+		unpack: function ( color ) {
 
-	        svg.childNodes[0].appendChild( dcopy );
-	        
-	        svg.setAttribute("version", "1.1");
-	        svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg' );
-	        svg.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
+			if ( color.length == 7 ) return [ Tools.u255( color, 1 ), Tools.u255( color, 3 ), Tools.u255( color, 5 ) ];
+			else if ( color.length == 4 ) return [ Tools.u16( color, 1 ), Tools.u16( color, 2 ), Tools.u16( color, 3 ) ];
 
-	        svg.setAttribute('width', w );
-	        svg.setAttribute('height', h );
-	        svg.childNodes[0].setAttribute('width', '100%' );
-	        svg.childNodes[0].setAttribute('height', '100%' );
+		},
 
-	        //console.log(svg)
+		htmlRgb: function ( rgb ) {
 
-	        var img = new Image();
-	        
+			return 'rgb(' + Math.round( rgb[ 0 ] * 255 ) + ',' + Math.round( rgb[ 1 ] * 255 ) + ',' + Math.round( rgb[ 2 ] * 255 ) + ')';
 
-	        var data = 'data:image/svg+xml;base64,'+ window.btoa((new XMLSerializer).serializeToString(svg));
-	        dcopy = null;
+		},
 
-	        img.onload = function() {
-	            ctx.clearRect( 0, 0, w, h );
-	            ctx.drawImage( img, 0, 0, w, h, 0, 0, w, h );
-	        };
-	        
-	        img.src = data;
+		rgbToHex: function ( rgb ) {
 
-	        /*setTimeout(function() {
+			return '#' + ( '000000' + ( ( rgb[ 0 ] * 255 ) << 16 ^ ( rgb[ 1 ] * 255 ) << 8 ^ ( rgb[ 2 ] * 255 ) << 0 ).toString( 16 ) ).slice( - 6 );
+
+		},
+
+		hueToRgb: function ( p, q, t ) {
+
+			if ( t < 0 ) t += 1;
+			if ( t > 1 ) t -= 1;
+			if ( t < 1 / 6 ) return p + ( q - p ) * 6 * t;
+			if ( t < 1 / 2 ) return q;
+			if ( t < 2 / 3 ) return p + ( q - p ) * 6 * ( 2 / 3 - t );
+			return p;
+
+		},
+
+		rgbToHsl: function ( rgb ) {
+
+			var r = rgb[ 0 ], g = rgb[ 1 ], b = rgb[ 2 ], min = Math.min( r, g, b ), max = Math.max( r, g, b ), delta = max - min, h = 0, s = 0, l = ( min + max ) / 2;
+			if ( l > 0 && l < 1 ) s = delta / ( l < 0.5 ? ( 2 * l ) : ( 2 - 2 * l ) );
+			if ( delta > 0 ) {
+
+				if ( max == r && max != g ) h += ( g - b ) / delta;
+				if ( max == g && max != b ) h += ( 2 + ( b - r ) / delta );
+				if ( max == b && max != r ) h += ( 4 + ( r - g ) / delta );
+				h /= 6;
+
+			}
+			return [ h, s, l ];
+
+		},
+
+		hslToRgb: function ( hsl ) {
+
+			var p, q, h = hsl[ 0 ], s = hsl[ 1 ], l = hsl[ 2 ];
+
+			if ( s === 0 ) return [ l, l, l ];
+			else {
+
+				q = l <= 0.5 ? l * ( s + 1 ) : l + s - ( l * s );
+				p = l * 2 - q;
+				return [ Tools.hueToRgb( p, q, h + 0.33333 ), Tools.hueToRgb( p, q, h ), Tools.hueToRgb( p, q, h - 0.33333 ) ];
+
+			}
+
+		},
+
+		// svg to canvas test
+
+		toCanvas: function ( canvas, content, w, h ) {
+
+			var ctx = canvas.getContext( "2d" );
+
+			var dcopy = null;
+
+			if ( typeof content === 'string' ) {
+
+				dcopy = Tools.dom( 'iframe', 'position:abolute; left:0; top:0; width:' + w + 'px; height:' + h + 'px;' );
+				dcopy.src = content;
+
+			} else {
+
+				dcopy = content.cloneNode( true );
+				dcopy.style.left = 0;
+
+			}
+
+			var svg = Tools.dom( 'foreignObject', 'position:abolute; left:0; top:0;', { width: w, height: h } );
+
+			svg.childNodes[ 0 ].appendChild( dcopy );
+
+			svg.setAttribute( "version", "1.1" );
+			svg.setAttribute( 'xmlns', 'http://www.w3.org/2000/svg' );
+			svg.setAttribute( "xmlns:xlink", "http://www.w3.org/1999/xlink" );
+
+			svg.setAttribute( 'width', w );
+			svg.setAttribute( 'height', h );
+			svg.childNodes[ 0 ].setAttribute( 'width', '100%' );
+			svg.childNodes[ 0 ].setAttribute( 'height', '100%' );
+
+			//console.log(svg)
+
+			var img = new Image();
+
+
+			var data = 'data:image/svg+xml;base64,' + window.btoa( ( new XMLSerializer() ).serializeToString( svg ) );
+			dcopy = null;
+
+			img.onload = function () {
+
+				ctx.clearRect( 0, 0, w, h );
+				ctx.drawImage( img, 0, 0, w, h, 0, 0, w, h );
+
+			};
+
+			img.src = data;
+
+			/*setTimeout(function() {
 	            ctx.clearRect( 0, 0, w, h );
 	            ctx.drawImage( img, 0, 0, w, h, 0, 0, w, h );
 	        }, 0);*/
 
-	        // blob
+			// blob
 
-	        /*var svgBlob = new Blob([(new XMLSerializer).serializeToString(svg)], {type: "image/svg+xml;charset=utf-8"});
+			/*var svgBlob = new Blob([(new XMLSerializer).serializeToString(svg)], {type: "image/svg+xml;charset=utf-8"});
 	        var url = URL.createObjectURL(svgBlob);
 
 	        img.onload = function() {
@@ -487,7 +527,7 @@
 	        };
 	        img.src = url;*/
 
-	    },
+		},
 
 	};
 
@@ -1720,7 +1760,7 @@
 
 		drawCircle: function(){
 
-		    var n = 24,r = this.colorRadius, w = this.wheelWidth, nudge = 8 / r / n * Math.PI, m = this.ctxMask, a1 = 0, color1, d1;
+		    var n = 24,r = this.colorRadius, w = this.wheelWidth, nudge = 8 / r / n * Math.PI, m = this.ctxMask, a1 = 0, color1;
 		    var ym, am, tan, xm, color2, d2, a2, ar;
 		    m.save();
 		    m.lineWidth = w / r;
@@ -1745,7 +1785,7 @@
 		        }
 		        a1 = a2 - nudge; 
 		        color1 = color2;
-		        d1 = d2;
+		        
 		    }
 		    m.restore();
 
@@ -3653,6 +3693,92 @@
 
 	} );
 
+	function FileInput(o) {
+
+	    Proto.call(this, o);
+
+	    this.callback = o.callback;
+
+	    this.value = o.value || '';
+
+	    this.baseH = 50;
+
+	    this.c[2] = Tools.dom('input', Tools.css.txtselect, { type: 'file' });
+	    this.c[2].name = 'input';
+	    //this.c[2].style.color = ;
+	    this.c[2].textContent = this.value;
+
+	    this.c[2].events = ['change'];
+
+	    this.c[3] = Tools.dom('img', 'position: relative; width: 100%; display: block; cursor: pointer;');
+
+	    this.init();
+
+	}
+
+	FileInput.prototype = Object.assign(Object.create(Proto.prototype), {
+
+	    constructor: FileInput,
+
+	    handleEvent: function (e) {
+
+	        switch (e.type) {
+	            case 'change': this.input(e); break;
+	        }
+
+	    },
+
+	    input: function (e) {
+	        if (this.c[2].files && this.c[2].files[0]) {
+	            var reader = new FileReader();
+
+	            var _this = this;
+
+	            reader.onload = function (e) {
+	                // let img = new Image()
+
+	                _this.c[3].src = e.target.result;
+
+	                if (_this.callback) _this.callback(_this.c[3]);
+
+	                setTimeout(function () {
+	                    _this.rSizeContent();
+	                }, 10);
+	            };
+
+	            reader.readAsDataURL(this.c[2].files[0]);
+	        }
+	    },
+
+	    rSizeContent() {
+	        this.rSize();
+	        this.main.calc(this.h - this.baseH);
+
+	        this.baseH = this.h;
+	    },
+
+	    rSize: function () {
+
+	        Proto.prototype.rSize.call(this);
+
+	        this.s[0].height = 'auto';
+	        this.s[0].overflow = '';
+
+	        this.s[2].left = this.sa + 'px';
+	        this.s[2].width = this.sb + 'px';
+	        this.s[2].height = 20 + 'px';
+
+	        this.s[0].padding = '10px 0';
+
+	        this.s[3].marginTop = 30 + 'px';
+	        this.s[3].marginLeft = this.sa + 'px';
+	        this.s[3].width = this.sb + 'px';
+
+	        this.h = Math.max(20, this.c[0].clientHeight);
+	    }
+
+	});
+
 	function Title ( o ) {
 	    
 	    Proto.call( this, o );
@@ -3705,73 +3831,77 @@
 
 	function getType( name, o ) {
 
-	        var n = null;
+		var n = null;
 
-	        switch( name ){
+		switch ( name ) {
 
-	            case 'Bool': case 'bool': n = new Bool(o); break;
-	            case 'Button': case 'button': n = new Button(o); break;
-	            case 'Circular': case 'circular': n = new Circular(o); break;
-	            case 'Color': case 'color': n = new Color(o); break;
-	            case 'Fps': case 'fps': n = new Fps(o); break;
-	            case 'Group': case 'group': n = new Group(o); break;
-	            case 'Joystick': case 'joystick': n = new Joystick(o); break;
-	            case 'Knob': case 'knob': n = new Knob(o); break;
-	            case 'List': case 'list': n = new List(o); break;
-	            case 'Numeric':case 'Number': case 'numeric':case 'number': n = new Numeric(o); break;
-	            case 'Slide': case 'slide': n = new Slide(o); break;
-	            case 'TextInput':case 'String': case 'textInput':case 'string': n = new TextInput(o); break;
-	            case 'Title': case 'title': n = new Title(o); break;
+			case 'Bool': case 'bool': n = new Bool( o ); break;
+			case 'Button': case 'button': n = new Button( o ); break;
+			case 'Circular': case 'circular': n = new Circular( o ); break;
+			case 'Color': case 'color': n = new Color( o ); break;
+			case 'Fps': case 'fps': n = new Fps( o ); break;
+			case 'Group': case 'group': n = new Group( o ); break;
+			case 'Joystick': case 'joystick': n = new Joystick( o ); break;
+			case 'Knob': case 'knob': n = new Knob( o ); break;
+			case 'List': case 'list': n = new List( o ); break;
+			case 'Numeric': case 'Number': case 'numeric': case 'number': n = new Numeric( o ); break;
+			case 'Slide': case 'slide': n = new Slide( o ); break;
+			case 'TextInput': case 'String': case 'textInput': case 'string': n = new TextInput( o ); break;
+			case 'FileInput': case 'String': case 'upload': case 'string': n = new FileInput( o ); break;
+			case 'Title': case 'title': n = new Title( o ); break;
 
-	        }
+		}
 
-	        return n;
-	}
-
-	function add (){
-
-	    var a = arguments; 
-
-	    var type, o, ref = false;
-
-	    if( typeof a[0] === 'string' ){ 
-
-	        type = a[0];//[0].toUpperCase() + a[0].slice(1);
-	        o = a[1] || {};
-
-	    } else if ( typeof a[0] === 'object' ){ // like dat gui
-
-	        ref = true;
-	        if( a[2] === undefined ) [].push.call(a, {});
-
-	        type = autoType.apply( this, a );
-
-	        o = a[2];
-
-	        o.name = a[1];
-	        o.value = a[0][a[1]];
-
-	    }
-
-	    var n = getType( type, o );
-
-	    if(n !== null ){
-	        if( ref ) n.setReferency( a[0], a[1] );
-	        return n;
-	    }
-	    
+		return n;
 
 	}
 
-	function autoType () {
+	function add() {
 
-	    var a = arguments;
+		var a = arguments;
 
-	    var type = 'Slide';
+		var type, o, ref = false;
 
-	    if(a[2].type) type = a[2].type;
+		if ( typeof a[ 0 ] === 'string' ) {
 
-	    return type;
+			type = a[ 0 ];//[0].toUpperCase() + a[0].slice(1);
+			o = a[ 1 ] || {};
+
+		} else if ( typeof a[ 0 ] === 'object' ) { // like dat gui
+
+			ref = true;
+			if ( a[ 2 ] === undefined )[].push.call( a, {} );
+
+			type = autoType.apply( this, a );
+
+			o = a[ 2 ];
+
+			o.name = a[ 1 ];
+			o.value = a[ 0 ][ a[ 1 ] ];
+
+		}
+
+		var n = getType( type, o );
+
+		if ( n !== null ) {
+
+			if ( ref ) n.setReferency( a[ 0 ], a[ 1 ] );
+			return n;
+		
+	}
+
+
+	}
+
+	function autoType() {
+
+		var a = arguments;
+
+		var type = 'Slide';
+
+		if ( a[ 2 ].type ) type = a[ 2 ].type;
+
+		return type;
 
 	}
 
@@ -3781,481 +3911,516 @@
 	 * @author lo-th / https://github.com/lo-th
 	 */
 
-	function Gui ( o ) {
+	function Gui( o ) {
 
-	    o = o || {};
+		o = o || {};
 
-	    // css plus
-	    this.css = o.css !== undefined ? o.css : '';
+		// css plus
+		this.css = o.css !== undefined ? o.css : '';
 
-	    // size define
-	    this.size = Tools.size;
-	    if( o.p !== undefined ) this.size.p = o.p;
-	    if( o.w !== undefined ) this.size.w = o.w;
-	    if( o.h !== undefined ) this.size.h = o.h;
-	    if( o.s !== undefined ) this.size.s = o.s;
+		// size define
+		this.size = Tools.size;
+		if ( o.p !== undefined ) this.size.p = o.p;
+		if ( o.w !== undefined ) this.size.w = o.w;
+		if ( o.h !== undefined ) this.size.h = o.h;
+		if ( o.s !== undefined ) this.size.s = o.s;
 
-	    this.size.h = this.size.h < 11 ? 11 : this.size.h;
+		this.size.h = this.size.h < 11 ? 11 : this.size.h;
 
-	    this.width = this.size.w;
+		this.width = this.size.w;
 
-	    // bottom height
-	    this.bh = this.size.h;
-
-
-
-
-	    //this.width = o.width !== undefined ? o.width : Tools.size.width;
-	    //this.width = o.size !== undefined ? o.size : this.width;
-
-
-	    // tmp variable
-	    this.height = 0;
-	    this.left = 0;
-	    this.h = 0;
-	    this.prevY = -1;
-	    this.sw = 0;
-
-
-	    // color
-	    this.colors = Tools.colors;
-	    this.bg = o.bg || Tools.colors.background;
-
-	    // bottom and close height
-	    this.isWithClose = true;
-	    
-
-	    //this.baseH = Tools.size.height;
-
-	    if(o.close !== undefined ){
-	        this.isWithClose = o.close;
-	        this.bh = !this.isWithClose ? 0 : this.bh;
-	    }
+		// bottom height
+		this.bh = this.size.h;
 
 
 
-	    
 
-	    Tools.main = this;
+		//this.width = o.width !== undefined ? o.width : Tools.size.width;
+		//this.width = o.size !== undefined ? o.size : this.width;
 
-	    this.callback = o.callback  === undefined ? null : o.callback;
 
-	   
-	    
-	    this.isCenter = o.center || false;
-	    this.lockwheel = false;
-	    this.onWheel = false;
-	    this.isOpen = true;
+		// tmp variable
+		this.height = 0;
+		this.left = 0;
+		this.h = 0;
+		this.prevY = - 1;
+		this.sw = 0;
 
-	    this.uis = [];
 
-	    this.content = Tools.dom( 'div', Tools.css.basic + 'display:block; width:'+this.width+'px; height:auto; top:0; right:10px; transition:height 0.1s ease-out;' + this.css );
-	    if( o.parent !== undefined ) o.parent.appendChild( this.content );
-	    else document.body.appendChild( this.content );
+		// color
+		this.colors = Tools.colors;
+		this.bg = o.bg || Tools.colors.background;
 
-	    this.innerContent = Tools.dom( 'div', Tools.css.basic + 'width:100%; top:0; left:0; height:auto; overflow:hidden;');
-	    this.content.appendChild( this.innerContent );
+		// bottom and close height
+		this.isWithClose = true;
 
-	    this.inner = Tools.dom( 'div', Tools.css.basic + 'width:100%; top:0; left:0; height:auto; background:'+this.bg+';');
-	    this.innerContent.appendChild(this.inner);
-	    this.inner.name = 'inner';
 
-	    // scroll background
-	    this.scrollBG = Tools.dom( 'div', Tools.css.basic + 'right:0; top:0; width:'+this.size.s+'px; height:10px; cursor:s-resize; pointer-events:auto; display:none; background:'+this.bg+'; border-left:1px solid '+this.colors.stroke+';');
-	    this.content.appendChild( this.scrollBG );
-	    this.scrollBG.name = 'scroll';
+		//this.baseH = Tools.size.height;
 
-	    // scroll
-	    this.scroll = Tools.dom( 'div', Tools.css.basic + 'background:'+this.colors.scroll+'; right:0px; top:0; width:'+this.size.s+'px; height:10px;');
-	    this.scrollBG.appendChild( this.scroll );
+		if ( o.close !== undefined ) {
 
-	    this.bottom = Tools.dom( 'div',  Tools.css.txt + 'width:100%; top:auto; bottom:0; left:0; border-bottom-right-radius:10px;  border-bottom-left-radius:10px; text-align:center; pointer-events:auto; cursor:pointer; height:'+this.bh+'px; line-height:'+(this.bh-5)+'px; border-top:1px solid '+Tools.colors.stroke+';');
-	    this.content.appendChild(this.bottom);
-	    this.bottom.textContent = 'close';
-	    this.bottom.name = 'bottom';
-	    this.bottom.style.background = this.bg;
-	    
-	    this.isDown = false;
-	    this.isScroll = false;
+			this.isWithClose = o.close;
+			this.bh = ! this.isWithClose ? 0 : this.bh;
 
-	    this.callbackClose = function(){};
+		}
 
-	    this.content.addEventListener( 'mousedown', this, false );
-	    this.content.addEventListener( 'mousemove', this, false );
-	    this.content.addEventListener( 'mouseout',  this, false );
-	    this.content.addEventListener( 'mouseup',   this, false );
-	    this.content.addEventListener( 'mouseover', this, false );
 
-	    //console.log(this.content.getBoundingClientRect().top);
 
-	    this.top = o.top || this.content.getBoundingClientRect().top;
-	    //this.content.addEventListener( 'mousewheel', this, false );
 
-	    document.addEventListener( 'mousewheel', function(e){this.wheel(e);}.bind(this), false );
-	    window.addEventListener("resize", function(e){this.resize(e);}.bind(this), false );
 
-	    //
+		Tools.main = this;
 
-	    this.setWidth( this.width );
+		this.callback = o.callback === undefined ? null : o.callback;
+
+
+
+		this.isCenter = o.center || false;
+		this.lockwheel = false;
+		this.onWheel = false;
+		this.isOpen = true;
+
+		this.uis = [];
+
+		this.content = Tools.dom( 'div', Tools.css.basic + 'display:block; width:' + this.width + 'px; height:auto; top:0; right:10px; transition:height 0.1s ease-out;' + this.css );
+		if ( o.parent !== undefined ) o.parent.appendChild( this.content );
+		else document.body.appendChild( this.content );
+
+		this.innerContent = Tools.dom( 'div', Tools.css.basic + 'width:100%; top:0; left:0; height:auto; overflow:hidden;' );
+		this.content.appendChild( this.innerContent );
+
+		this.inner = Tools.dom( 'div', Tools.css.basic + 'width:100%; top:0; left:0; height:auto; background:' + this.bg + ';' );
+		this.innerContent.appendChild( this.inner );
+		this.inner.name = 'inner';
+
+		// scroll background
+		this.scrollBG = Tools.dom( 'div', Tools.css.basic + 'right:0; top:0; width:' + this.size.s + 'px; height:10px; cursor:s-resize; pointer-events:auto; display:none; background:' + this.bg + '; border-left:1px solid ' + this.colors.stroke + ';' );
+		this.content.appendChild( this.scrollBG );
+		this.scrollBG.name = 'scroll';
+
+		// scroll
+		this.scroll = Tools.dom( 'div', Tools.css.basic + 'background:' + this.colors.scroll + '; right:0px; top:0; width:' + this.size.s + 'px; height:10px;' );
+		this.scrollBG.appendChild( this.scroll );
+
+		this.bottom = Tools.dom( 'div', Tools.css.txt + 'width:100%; top:auto; bottom:0; left:0; border-bottom-right-radius:10px;  border-bottom-left-radius:10px; text-align:center; pointer-events:auto; cursor:pointer; height:' + this.bh + 'px; line-height:' + ( this.bh - 5 ) + 'px; border-top:1px solid ' + Tools.colors.stroke + ';' );
+		this.content.appendChild( this.bottom );
+		this.bottom.textContent = 'close';
+		this.bottom.name = 'bottom';
+		this.bottom.style.background = this.bg;
+
+		this.isDown = false;
+		this.isScroll = false;
+
+		this.callbackClose = function () { };
+
+		this.content.addEventListener( 'mousedown', this, false );
+		this.content.addEventListener( 'mousemove', this, false );
+		this.content.addEventListener( 'mouseout', this, false );
+		this.content.addEventListener( 'mouseup', this, false );
+		this.content.addEventListener( 'mouseover', this, false );
+
+		//console.log(this.content.getBoundingClientRect().top);
+
+		this.top = o.top || this.content.getBoundingClientRect().top;
+		//this.content.addEventListener( 'mousewheel', this, false );
+
+		document.addEventListener( 'mousewheel', function ( e ) {
+
+			this.wheel( e );
+		
+	}.bind( this ), false );
+		window.addEventListener( "resize", function ( e ) {
+
+			this.resize( e );
+		
+	}.bind( this ), false );
+
+		//
+
+		this.setWidth( this.width );
 
 	}
 
 	Gui.prototype = {
 
-	    constructor: Gui,
+		constructor: Gui,
 
-	    setText: function ( size, color, font ) {
+		setText: function ( size, color, font ) {
 
-	        Tools.setText( size, color, font );
+			Tools.setText( size, color, font );
 
-	    },
+		},
 
-	    hide : function (b) {
+		hide: function ( b ) {
 
-	        if(b) this.content.style.display = 'none';
-	        else this.content.style.display = 'block';
-	        
-	    },
+			if ( b ) this.content.style.display = 'none';
+			else this.content.style.display = 'block';
 
-	    setBG : function(c){
+		},
 
-	        this.bg = c;
+		setBG: function ( c ) {
 
-	        /*var i = this.uis.length;
+			this.bg = c;
+
+			/*var i = this.uis.length;
 	        while(i--){
 	            this.uis[i].setBG(c);
 	        }*/
 
-	        this.innerstyle.background = this.bg;
-	        this.bottom.style.background = this.bg;
+			this.innerstyle.background = this.bg;
+			this.bottom.style.background = this.bg;
 
-	    },
+		},
 
-	    getHTML : function(){
+		getHTML: function () {
 
-	        return this.content;
+			return this.content;
 
-	    },
+		},
 
-	    onChange : function( f ){
+		onChange: function ( f ) {
 
-	        this.callback = f;
-	        return this;
+			this.callback = f;
+			return this;
 
-	    },
+		},
 
-	    handleEvent : function( e ) {
+		handleEvent: function ( e ) {
 
-	        //e.preventDefault();
-	        //e.stopPropagation();
+			//e.preventDefault();
+			//e.stopPropagation();
 
-	        switch( e.type ) {
-	            case 'mousedown': this.down( e ); break;
-	            case 'mouseout': this.out( e ); break;
-	            case 'mouseover': this.over( e ); break;
-	            //case 'mousewheel': this.wheel( e ); break;
+			switch ( e.type ) {
 
-	            case 'mouseup': this.up( e ); break;
-	            case 'mousemove': this.move( e ); break;
-	        }
+				case 'mousedown': this.down( e ); break;
+				case 'mouseout': this.out( e ); break;
+				case 'mouseover': this.over( e ); break;
+					//case 'mousewheel': this.wheel( e ); break;
 
-	    },
+				case 'mouseup': this.up( e ); break;
+				case 'mousemove': this.move( e ); break;
 
-	    // Mouse event
+			}
 
-	    down: function( e ){
+		},
 
-	        if( !e.target.name ) return;
+		// Mouse event
 
-	        if(e.target.name === 'scroll'){
-	            this.isDown = true;
-	            this.move( e );
-	            document.addEventListener( 'mouseup', this, false );
-	            document.addEventListener( 'mousemove', this, false );
-	        }
-	        if(e.target.name === 'bottom'){
-	            this.isOpen = this.isOpen ? false : true;
-	            this.bottom.textContent = this.isOpen ? 'close' : 'open';
-	            this.testHeight();
-	        }
-	        
-	    },
+		down: function ( e ) {
 
-	    move: function( e ){
+			if ( ! e.target.name ) return;
 
-	        if(!this.isDown) return;
-	        this.scroll.style.background = this.colors.down;
-	        this.update( (e.clientY-this.top)-(this.sh*0.5) );
+			if ( e.target.name === 'scroll' ) {
 
-	    },
+				this.isDown = true;
+				this.move( e );
+				document.addEventListener( 'mouseup', this, false );
+				document.addEventListener( 'mousemove', this, false );
 
-	    
+			}
+			if ( e.target.name === 'bottom' ) {
 
-	    out: function( e ){
+				this.isOpen = this.isOpen ? false : true;
+				this.bottom.textContent = this.isOpen ? 'close' : 'open';
+				this.testHeight();
 
-	        if( !e.target.name ) return;
+			}
 
-	        if(e.target.name === 'scroll'){
-	            this.scroll.style.background = this.colors.scroll;
-	        }
+		},
 
-	        if(e.target.name === 'bottom'){
-	            this.bottom.style.color = '#CCC';
-	        }
+		move: function ( e ) {
 
-	    },
+			if ( ! this.isDown ) return;
+			this.scroll.style.background = this.colors.down;
+			this.update( ( e.clientY - this.top ) - ( this.sh * 0.5 ) );
 
-	    up: function( e ){
+		},
 
-	        this.isDown = false;
-	        this.scroll.style.background = this.colors.scroll;
-	        document.removeEventListener( 'mouseup', this, false );
-	        document.removeEventListener( 'mousemove', this, false );
 
-	    },
 
-	    over: function( e ){
+		out: function ( e ) {
 
-	        if( !e.target.name ) return;
-	        if(e.target.name === 'scroll'){
-	            this.scroll.style.background = this.colors.select;
-	        }
-	        if(e.target.name === 'bottom'){
-	            this.bottom.style.color = '#FFF';
-	        }
+			if ( ! e.target.name ) return;
 
-	    },
+			if ( e.target.name === 'scroll' ) {
 
-	    // Wheel event
+				this.scroll.style.background = this.colors.scroll;
 
-	    wheel: function ( e ){
+			}
 
-	        //e.preventDefault();
-	        //e.stopPropagation();
+			if ( e.target.name === 'bottom' ) {
 
-	        if( this.lockwheel || !this.isScroll ) return;
+				this.bottom.style.color = '#CCC';
 
-	        //this.onWheel = true;
+			}
 
-	        var x = e.clientX;
-	        var px = this.content.getBoundingClientRect().left;
+		},
 
-	        if(x<px) return;
-	        if(x>(px+this.width)) return;
+		up: function ( e ) {
 
-	        var delta = 0;
-	        if(e.wheelDeltaY) delta = -e.wheelDeltaY*0.04;
-	        else if(e.wheelDelta) delta = -e.wheelDelta*0.2;
-	        else if(e.detail) delta = e.detail*4.0;
+			this.isDown = false;
+			this.scroll.style.background = this.colors.scroll;
+			document.removeEventListener( 'mouseup', this, false );
+			document.removeEventListener( 'mousemove', this, false );
 
-	        this.py += delta;
+		},
 
-	        this.update( this.py );
+		over: function ( e ) {
 
-	    },
+			if ( ! e.target.name ) return;
+			if ( e.target.name === 'scroll' ) {
 
-	    // -----------------------------------
+				this.scroll.style.background = this.colors.select;
 
-	    // Add node to gui
+			}
+			if ( e.target.name === 'bottom' ) {
 
-	    add:function(){
+				this.bottom.style.color = '#FFF';
 
-	        var a = arguments;
+			}
 
-	        if( typeof a[1] === 'object' ){ 
+		},
 
-	            a[1].isUI = true;
-	            a[1].main = this;
+		// Wheel event
 
-	        } else if( typeof a[1] === 'string' ){
+		wheel: function ( e ) {
 
-	            if( a[2] === undefined ) [].push.call(a, { isUI:true, main:this });
-	            else {
-	                a[2].isUI = true;
-	                a[2].main = this;
-	            }
-	            
-	        } 
+			//e.preventDefault();
+			//e.stopPropagation();
 
+			if ( this.lockwheel || ! this.isScroll ) return;
 
-	        var n = add.apply( this, a );
-	        //var n = UIL.add( ...args );
+			//this.onWheel = true;
 
-	        this.uis.push( n );
-	        n.py = this.h;
+			var x = e.clientX;
+			var px = this.content.getBoundingClientRect().left;
 
-	        if( !n.autoWidth ){
-	            var y = n.c[0].getBoundingClientRect().top;
-	            if( this.prevY !== y ){
-	                this.calc( n.h + 1 );
-	                this.prevY = y;
-	            }
-	        }else{
-	            this.prevY = -1;
-	            this.calc( n.h + 1 );
-	        }
+			if ( x < px ) return;
+			if ( x > ( px + this.width ) ) return;
 
-	        return n;
-	    },
+			var delta = 0;
+			if ( e.wheelDeltaY ) delta = - e.wheelDeltaY * 0.04;
+			else if ( e.wheelDelta ) delta = - e.wheelDelta * 0.2;
+			else if ( e.detail ) delta = e.detail * 4.0;
 
-	    // remove one node
+			this.py += delta;
 
-	    remove: function ( n ) { 
+			this.update( this.py );
 
-	        var i = this.uis.indexOf( n ); 
-	        if ( i !== -1 ) this.uis[i].clear();
+		},
 
-	    },
+		// -----------------------------------
 
-	    // call after uis clear
+		// Add node to gui
 
-	    clearOne: function ( n ) { 
+		add: function () {
 
-	        var i = this.uis.indexOf( n ); 
-	        if ( i !== -1 ) {
-	            this.inner.removeChild( this.uis[i].c[0] );
-	            this.uis.splice( i, 1 ); 
-	        }
+			var a = arguments;
 
-	    },
+			if ( typeof a[ 1 ] === 'object' ) {
 
-	    // clear all gui
+				a[ 1 ].isUI = true;
+				a[ 1 ].main = this;
 
-	    clear:function(){
+			} else if ( typeof a[ 1 ] === 'string' ) {
 
-	        var i = this.uis.length;
-	        while(i--) this.uis[i].clear();
+				if ( a[ 2 ] === undefined )[].push.call( a, { isUI: true, main: this } );
+				else {
 
-	        this.uis = [];
-	        Tools.listens = [];
+					a[ 2 ].isUI = true;
+					a[ 2 ].main = this;
 
-	        this.calc( - this.h );
+				}
 
-	    },
+			}
 
-	    // -----------------------------------
 
-	    // Scroll
+			var n = add.apply( this, a );
+			//var n = UIL.add( ...args );
 
-	    update: function ( y ){
+			this.uis.push( n );
+			n.py = this.h;
 
-	        y = y < 0 ? 0 :y;
-	        y = y > this.range ? this.range : y;
+			if ( ! n.autoWidth ) {
 
-	        this.inner.style.top = - Math.floor( y / this.ratio ) + 'px';
-	        this.scroll.style.top = Math.floor( y ) + 'px';
+				var y = n.c[ 0 ].getBoundingClientRect().top;
+				if ( this.prevY !== y ) {
 
-	        this.py = y;
+					this.calc( n.h + 1 );
+					this.prevY = y;
 
-	        //this.onWheel = false;
+				}
 
-	    },
+			} else {
 
-	    showScroll:function(h){
+				this.prevY = - 1;
+				this.calc( n.h + 1 );
 
-	        this.isScroll = true;
-	        this.sw = this.size.s;
+			}
 
-	        this.total = this.h;
-	        this.maxView = this.maxHeight;// - this.height;
+			return n;
 
-	        this.ratio = this.maxView / this.total;
-	        this.sh = this.maxView * this.ratio;
+		},
 
-	        if( this.sh < 20 ) this.sh = 20;
+		// remove one node
 
-	        this.range = this.maxView - this.sh;
+		remove: function ( n ) {
 
-	        this.scrollBG.style.display = 'block';
-	        this.scrollBG.style.height = this.maxView + 'px';
-	        this.scroll.style.height = this.sh + 'px';
+			var i = this.uis.indexOf( n );
+			if ( i !== - 1 ) this.uis[ i ].clear();
 
-	        
+		},
 
-	        this.setItemWidth( this.width - this.sw );
+		// call after uis clear
 
-	        this.update( 0 );
+		clearOne: function ( n ) {
 
-	    },
+			var i = this.uis.indexOf( n );
+			if ( i !== - 1 ) {
 
-	    hideScroll:function(){
+				this.inner.removeChild( this.uis[ i ].c[ 0 ] );
+				this.uis.splice( i, 1 );
 
-	        this.isScroll = false;
-	        this.sw = 0;
-	        
+			}
 
-	        this.setItemWidth( this.width - this.sw );
+		},
 
-	        this.update( 0 );
+		// clear all gui
 
-	        this.scrollBG.style.display = 'none';
+		clear: function () {
 
-	    },
+			var i = this.uis.length;
+			while ( i -- ) this.uis[ i ].clear();
 
-	    // -----------------------------------
+			this.uis = [];
+			Tools.listens = [];
 
-	    resize:function(e){
+			this.calc( - this.h );
 
-	        this.testHeight();
+		},
 
-	    },
+		// -----------------------------------
 
-	    calc:function( y ) {
+		// Scroll
 
-	        this.h += y;
-	        clearTimeout( this.tmp );
-	        this.tmp = setTimeout( this.testHeight.bind(this), 10 );
+		update: function ( y ) {
 
-	    },
+			y = y < 0 ? 0 : y;
+			y = y > this.range ? this.range : y;
 
-	    testHeight:function(){
+			this.inner.style.top = - Math.floor( y / this.ratio ) + 'px';
+			this.scroll.style.top = Math.floor( y ) + 'px';
 
-	        if( this.tmp ) clearTimeout( this.tmp );
+			this.py = y;
 
-	        this.height = this.top + this.bh;
+			//this.onWheel = false;
 
-	        if( this.isOpen ){
+		},
 
-	            this.maxHeight = window.innerHeight - this.top - this.bh;
+		showScroll: function ( h ) {
 
-	            if( this.h > this.maxHeight ){
+			this.isScroll = true;
+			this.sw = this.size.s;
 
-	                this.height = this.maxHeight + this.bh;
-	                this.showScroll();
+			this.total = this.h;
+			this.maxView = this.maxHeight;// - this.height;
 
-	            }else{
+			this.ratio = this.maxView / this.total;
+			this.sh = this.maxView * this.ratio;
 
-	                this.height = this.h + this.bh;
-	                this.hideScroll();
+			if ( this.sh < 20 ) this.sh = 20;
 
-	            }
+			this.range = this.maxView - this.sh;
 
-	        } else {
+			this.scrollBG.style.display = 'block';
+			this.scrollBG.style.height = this.maxView + 'px';
+			this.scroll.style.height = this.sh + 'px';
 
-	            this.height = this.bh;
-	            this.hideScroll();
 
-	        }
 
-	        this.innerContent.style.height = this.height - this.bh + 'px';
-	        this.content.style.height = this.height + 'px';
-	        this.bottom.style.top = this.height - this.bh + 'px';
+			this.setItemWidth( this.width - this.sw );
 
-	    },
+			this.update( 0 );
 
-	    setWidth: function( w ) {
+		},
 
-	        if( w ) this.width = w;
-	        this.content.style.width = this.width + 'px';
+		hideScroll: function () {
 
-	        //console.log(this.width)
+			this.isScroll = false;
+			this.sw = 0;
 
 
-	        if( this.isCenter ) this.content.style.marginLeft = -(~~ (this.width*0.5)) + 'px';
+			this.setItemWidth( this.width - this.sw );
 
-	        this.setItemWidth( this.width - this.sw );
+			this.update( 0 );
 
-	        /*var l = this.uis.length;
+			this.scrollBG.style.display = 'none';
+
+		},
+
+		// -----------------------------------
+
+		resize: function ( e ) {
+
+			this.testHeight();
+
+		},
+
+		calc: function ( y ) {
+
+			this.h += y;
+			clearTimeout( this.tmp );
+			this.tmp = setTimeout( this.testHeight.bind( this ), 10 );
+
+		},
+
+		testHeight: function () {
+
+			if ( this.tmp ) clearTimeout( this.tmp );
+
+			this.height = this.top + this.bh;
+
+			if ( this.isOpen ) {
+
+				this.maxHeight = window.innerHeight - this.top - this.bh;
+
+				if ( this.h > this.maxHeight ) {
+
+					this.height = this.maxHeight + this.bh;
+					this.showScroll();
+
+				} else {
+
+					this.height = this.h + this.bh;
+					this.hideScroll();
+
+				}
+
+			} else {
+
+				this.height = this.bh;
+				this.hideScroll();
+
+			}
+
+			this.innerContent.style.height = this.height - this.bh + 'px';
+			this.content.style.height = this.height + 'px';
+			this.bottom.style.top = this.height - this.bh + 'px';
+
+		},
+
+		setWidth: function ( w ) {
+
+			if ( w ) this.width = w;
+			this.content.style.width = this.width + 'px';
+
+			//console.log(this.width)
+
+
+			if ( this.isCenter ) this.content.style.marginLeft = - ( ~ ~ ( this.width * 0.5 ) ) + 'px';
+
+			this.setItemWidth( this.width - this.sw );
+
+			/*var l = this.uis.length;
 	        var i = l;
 	        while(i--){
 	            this.uis[i].setSize( this.width );
@@ -4266,19 +4431,21 @@
 	            this.uis[i].rSize();
 	        }*/
 
-	        this.resize();
+			this.resize();
 
-	    },
+		},
 
-	    setItemWidth: function( w ){
+		setItemWidth: function ( w ) {
 
-	        var i = this.uis.length;
-	        while(i--){
-	            this.uis[i].setSize( w );
-	            this.uis[i].rSize();
-	        }
+			var i = this.uis.length;
+			while ( i -- ) {
 
-	    },
+				this.uis[ i ].setSize( w );
+				this.uis[ i ].rSize();
+
+			}
+
+		},
 
 
 	};
@@ -4298,6 +4465,7 @@
 	exports.Numeric = Numeric;
 	exports.Slide = Slide;
 	exports.TextInput = TextInput;
+	exports.FileInput = FileInput;
 	exports.Title = Title;
 	exports.add = add;
 	exports.REVISION = REVISION;

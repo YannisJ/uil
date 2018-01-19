@@ -48,6 +48,8 @@
     "eslint": "latest",
     "eslint-config-mdcs": "latest",
     "rollup": "latest",
+    "rollup-plugin-livereload": "^0.6.0",
+    "rollup-plugin-serve": "^0.4.2",
     "rollup-watch": "latest",
     "uglify-js": "latest"
   }

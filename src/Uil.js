@@ -18,4 +18,5 @@ export { List } from './proto/List.js';
 export { Numeric } from './proto/Numeric.js';
 export { Slide } from './proto/Slide.js';
 export { TextInput } from './proto/TextInput.js';
+export { FileInput } from './proto/FileInput.js';
 export { Title } from './proto/Title.js';
